@@ -165,16 +165,18 @@ public class AccelerometerPlayActivity extends Activity {
                 super(context, attrs, defStyleAttr, defStyleRes);
             }
 
-            public void computePhysics(float sx, float sy, float deltaTime) {
+            // Uses deltaTime to account for possible irregular sensor intervals
+            public void computePhysics(float sensorX, float sensorY, float deltaTime) {
 
-                final float ax = -sx/10;
-                final float ay = -sy/10;
+                // Divide by 10 to reduce speed/sensitivity
+                final float accelX = -sensorX/10;
+                final float accelY = -sensorY/10;
 
-                mPosX += mVelX * deltaTime + ax * deltaTime * deltaTime / 2;
-                mPosY += mVelY * deltaTime + ay * deltaTime * deltaTime / 2;
+                mPosX += mVelX * deltaTime + accelX * deltaTime * deltaTime / 2;
+                mPosY += mVelY * deltaTime + accelY * deltaTime * deltaTime / 2;
 
-                mVelX += ax * deltaTime;
-                mVelY += ay * deltaTime;
+                mVelX += accelX * deltaTime;
+                mVelY += accelY * deltaTime;
             }
 
             /*
@@ -228,14 +230,14 @@ public class AccelerometerPlayActivity extends Activity {
              * Update the position of each particle in the system using the
              * Verlet integrator.
              */
-            private void updatePositions(float sx, float sy, long timestamp) {
+            private void updatePositions(float sensorX, float sensorY, long timestamp) {
                 final long t = timestamp;
                 if (mLastT != 0) {
                     final float deltaTime = (float) (t - mLastT) / 1000.f /** (1.0f / 1000000000.0f)*/;
                         final int count = mBalls.length;
                         for (int i = 0; i < count; i++) {
                             Particle ball = mBalls[i];
-                            ball.computePhysics(sx, sy, deltaTime);
+                            ball.computePhysics(sensorX, sensorY, deltaTime);
                         }
                 }
                 mLastT = t;
@@ -246,9 +248,9 @@ public class AccelerometerPlayActivity extends Activity {
              * position of all the particles and resolving the constraints and
              * collisions.
              */
-            public void update(float sx, float sy, long now) {
+            public void update(float sensorX, float sensorY, long now) {
                 // update the system's positions
-                updatePositions(sx, sy, now);
+                updatePositions(sensorX, sensorY, now);
 
                 // We do no more than a limited number of iterations
                 final int NUM_MAX_ITERATIONS = 10;
@@ -359,6 +361,7 @@ public class AccelerometerPlayActivity extends Activity {
         public void onSensorChanged(SensorEvent event) {
             if (event.sensor.getType() != Sensor.TYPE_ACCELEROMETER)
                 return;
+
             /*
              * record the accelerometer data, the event's timestamp as well as
              * the current time. The latter is needed so we can calculate the
@@ -399,6 +402,7 @@ public class AccelerometerPlayActivity extends Activity {
             final float sx = mSensorX;
             final float sy = mSensorY;
 
+            // Use the sensor data here
             particleSystem.update(sx, sy, now);
 
             final float xc = mXOrigin;
