@@ -116,7 +116,7 @@ public class AccelerometerPlayActivity extends Activity {
 
     class SimulationView extends FrameLayout implements SensorEventListener {
         // diameter of the balls in meters
-        private static final float sBallDiameter = 0.01f;
+        private static final float sBallDiameter = 0.02f;
         private static final float sBallDiameter2 = sBallDiameter * sBallDiameter;
 
         private final int mDstWidth;
@@ -190,17 +190,17 @@ public class AccelerometerPlayActivity extends Activity {
                 final float y = mPosY;
                 if (x > xmax) {
                     mPosX = xmax;
-                    mVelX = 0;
+                    mVelX *= -0.7;
                 } else if (x < -xmax) {
                     mPosX = -xmax;
-                    mVelX = 0;
+                    mVelX *= -0.7;
                 }
                 if (y > ymax) {
                     mPosY = ymax;
-                    mVelY = 0;
+                    mVelY *= -0.7;
                 } else if (y < -ymax) {
                     mPosY = -ymax;
-                    mVelY = 0;
+                    mVelY *= -0.7;
                 }
             }
         }
